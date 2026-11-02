@@ -1,7 +1,22 @@
+from pydantic import BaseModel, Field, PositiveInt, NonNegativeFloat, computed_field
 from pydantic import BaseModel, computed_field
 from typing import Dict, List
 
 import json
+
+
+class ApartmentSettlement(BaseModel):
+    apartament: str
+    settlement_year: int = Field(..., ge=1900, le=2100)
+    settlement_month: int = Field(..., ge=1, le=12)
+    total_bills_pln: float = Field(default=0.0, ge=0.0)
+    total_rent_pln: float = Field(default=0.0, ge=0.0)
+    total_paid_pln: float = Field(default=0.0, ge=0.0)
+
+    @computed_field
+    @property
+    def remaining_amount_pln(self) -> float:
+        return (self.total_bills_pln + self.total_rent_pln) - self.total_paid_pln
 
 
 class Parameters(BaseModel):
@@ -143,5 +158,6 @@ if __name__ == '__main__':
               tenant.deposit_pln, tenant.date_agreement_from, tenant.date_agreement_to)
         for transfer in manager.transfers:
             if transfer.tenant == tenant.name:
+                print('  ', transfer.amount_pln, transfer.date, transfer.settlement_year, transfer.settlement_month)
                 print('  ', transfer.amount_pln, transfer.date,
                       transfer.settlement_year, transfer.settlement_month)
