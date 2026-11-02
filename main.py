@@ -142,34 +142,25 @@ if __name__ == '__main__':
     parameters = Parameters()
     manager = Manager(parameters)
 
-    print("=" * 60)
-    print(" APARTMENTS & BILLS ")
-    print("=" * 60)
-    for apt in manager.apartments.values():
-        print(f"\n🏠 [{apt.key}] {apt.name} ({apt.location}) - {apt.area_m2} m²")
-        
-        print("   Pokoje:")
-        for r_key, room in apt.rooms.items():
-            print(f"     - [{r_key}] {room.name}: {room.area_m2} m²")
+    for apartment in manager.apartments.values():
+        print("-"*50)
+        print(apartment.key, apartment.name,
+              apartment.location, apartment.area_m2)
+        for room in apartment.rooms.values():
+            print('  ', room.name, room.area_m2)
 
-        apt_bills = [b for b in manager.bills if b.apartment == apt.key]
-        if apt_bills:
-            print("   Rachunki:")
-            for bill in apt_bills:
-                print(f"     - {bill.type.upper():<12} | {bill.amount_pln:>7.2f} PLN | Okres: {bill.settlement_year}-{bill.settlement_month:02d} | Termin: {bill.date_due}")
+        for bill in manager.bills:
+            if bill.apartment == apartment.key:
+                print('  ', bill.amount_pln, bill.date_due,
+                      bill.settlement_year, bill.settlement_month, bill.type)
 
-    print("\n" + "=" * 60)
-    print(" TENANTS & TRANSFERS ")
-    print("=" * 60)
-    for t_key, tenant in manager.tenants.items():
-        print(f"\n👤 [{t_key}] {tenant.name}")
-        print(f"   Mieszkanie: {tenant.apartment} | Pokój: {tenant.room}")
-        print(f"   Czynsz: {tenant.rent_pln:.2f} PLN | Kaucja: {tenant.deposit_pln:.2f} PLN")
-        print(f"   Umowa: od {tenant.date_agreement_from} do {tenant.date_agreement_to}")
-
-        tenant_transfers = [tr for tr in manager.transfers if tr.tenant == t_key or tr.tenant == tenant.name]
-        if tenant_transfers:
-            print("   Przelewy:")
-            for tr in tenant_transfers:
-                period = f"{tr.settlement_year}-{tr.settlement_month:02d}" if tr.settlement_year and tr.settlement_month else "Brak okresu"
-                print(f"     - {tr.amount_pln:>7.2f} PLN | Data: {tr.date} | Rozliczenie: {period}")
+    for tenant in manager.tenants.values():
+        print("-"*50)
+        print(tenant.name, tenant.apartment, tenant.room, tenant.rent_pln,
+              tenant.deposit_pln, tenant.date_agreement_from, tenant.date_agreement_to)
+        for transfer in manager.transfers:
+            if transfer.tenant == tenant.name:
+                print('  ', transfer.amount_pln, transfer.date,
+                      transfer.settlement_year, transfer.settlement_month)
+                print('  ', transfer.amount_pln, transfer.date,
+                      transfer.settlement_year, transfer.settlement_month)
